@@ -1,9 +1,71 @@
-(function(s,a){typeof exports=="object"&&typeof module<"u"?a(require("react"),require("react-dom")):typeof define=="function"&&define.amd?define(["react","react-dom"],a):(s=typeof globalThis<"u"?globalThis:s||self,a(s.React,s.ReactDOM))})(this,function(s,a){"use strict";var m={exports:{}},u={};/**
- * @license React
- * react-jsx-runtime.production.min.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */var h=s,T=Symbol.for("react.element"),y=Symbol.for("react.fragment"),b=Object.prototype.hasOwnProperty,w=h.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,E={key:!0,ref:!0,__self:!0,__source:!0};function p(t,e,n){var o,d={},r=null,c=null;n!==void 0&&(r=""+n),e.key!==void 0&&(r=""+e.key),e.ref!==void 0&&(c=e.ref);for(o in e)b.call(e,o)&&!E.hasOwnProperty(o)&&(d[o]=e[o]);if(t&&t.defaultProps)for(o in e=t.defaultProps,e)d[o]===void 0&&(d[o]=e[o]);return{$$typeof:T,type:t,key:r,ref:c,props:d,_owner:w.current}}u.Fragment=y,u.jsx=p,u.jsxs=p,m.exports=u;var i=m.exports;window.process={env:{NODE_ENV:"production"}};var l,x=a;l=x.createRoot,x.hydrateRoot;const R=({id:t,message:e,type:n,onRemove:o})=>{s.useEffect(()=>{const r=setTimeout(()=>o(t),3e3);return()=>clearTimeout(r)},[t,o]);const d=n==="success"?"bg-green-500":n==="error"?"bg-red-500":"bg-blue-500";return i.jsx("div",{className:`fixed bottom-5 right-5 p-4 mb-4 text-white rounded ${d}`,children:e})},v=s.createContext(void 0),j=()=>{const t=s.useContext(v);if(!t)throw new Error("useToast must be used within a ToastProvider");return t};let g=0;const O=({children:t})=>{const[e,n]=s.useState([]),o=(r,c)=>{const f=(g++).toString();n(N=>[...N,{id:f,message:r,type:c}])},d=r=>{n(c=>c.filter(f=>f.id!==r))};return i.jsxs(v.Provider,{value:{addToast:o},children:[t,i.jsx("div",{className:"fixed bottom-5 right-5 space-y-4",children:e.map(r=>i.jsx(R,{id:r.id,message:r.message,type:r.type,onRemove:d},r.id))})]})},C=()=>{const{addToast:t}=j();return s.useEffect(()=>{window.showToast=(e,n)=>{t(e,n)}},[t]),null},_=document.createElement("div");document.body.appendChild(_),l(_).render(i.jsx(O,{children:i.jsx(C,{})}))});
+(function () {
+  const toastContainer = document.createElement("div");
+  toastContainer.className = "toast-container";
+  document.body.appendChild(toastContainer);
+
+  function showToast(message, type = "info") {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+
+    const closeButton = document.createElement("span");
+    closeButton.className = "toast-close";
+    closeButton.textContent = "×";
+    closeButton.onclick = () => {
+      toastContainer.removeChild(toast);
+    };
+
+    toast.appendChild(closeButton);
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add("show");
+    }, 100);
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toastContainer.removeChild(toast);
+      }, 300);
+    }, 3000);
+  }
+
+  window.showToast = showToast;
+
+  const style = document.createElement("style");
+  style.textContent = `
+      .toast-container {
+          position: fixed;
+          bottom: 10px;
+          right: 10px;
+          z-index: 9999;
+      }
+      .toast {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+          padding: 10px 20px;
+          border-radius: 5px;
+          color: #fff;
+          opacity: 0;
+          transition: opacity 0.3s ease-in-out;
+      }
+      .toast.show {
+          opacity: 1;
+      }
+      .toast.success {
+          background-color: #4caf50;
+      }
+      .toast.error {
+          background-color: #f44336;
+      }
+      .toast.info {
+          background-color: #2196f3;
+      }
+      .toast-close {
+          margin-left: 10px;
+          cursor: pointer;
+      }
+  `;
+  document.head.appendChild(style);
+})();
